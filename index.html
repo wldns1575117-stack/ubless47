@@ -1954,17 +1954,15 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyDZNdbX1VEx9JBn3ir0Hhm
 
 async function saveToStorage() {
   try {
-    const data = JSON.stringify({
+    const data = encodeURIComponent(JSON.stringify({
       complaints, notices, noticeComments, shortcuts,
       complaintCounter, noticeCounter, commentCounter
-    });
-    await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: data
-    });
-    console.log('✅ 저장 완료');
-  } catch(e) { console.warn('저장 실패:', e); }
+    }));
+    const res = await fetch(GAS_URL + '?action=save&data=' + data);
+    const text = await res.text();
+    if (text === 'ok') console.log('✅ 저장 완료');
+    else console.warn('저장 실패:', text);
+  } catch(e) { console.warn('저장 오류:', e); }
 }
 
 async function loadFromStorage() {
