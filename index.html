@@ -3533,10 +3533,10 @@ function downloadNoiseReport() {
   td { padding: 7px 10px; border-bottom: 1px solid #f0ebe0; }
   tr:last-child td { border-bottom: none; }
   tr:nth-child(even) td { background: #faf8f4; }
-  .note-sm { font-size: 11px; color: #a08060; margin-bottom: 8px; }
+  .note-sm { font-size: 10px; color: #a08060; margin-bottom: 6px; line-height: 1.6; background:#faf6f0; border:1px solid #e8d5b0; border-radius:6px; padding:5px 8px; }
 
   /* 2열 레이아웃 */
-  .two-col { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
   /* 행동 안내 박스 */
   .action-box { background: #f0ebe0; border: 1px solid #c8a96e; border-radius: 10px; padding: 14px 18px; }
@@ -3584,13 +3584,13 @@ function downloadNoiseReport() {
 <div class="section two-col">
   <div>
     <div class="section-title">🏢 동·층대별 신고 현황 TOP 5</div>
-    <p class="note-sm">※ 구역 A(4~8층) B(9~13층) C(14~18층) D(19~23층) E(24~28층) F(29~33층) G(34~38층) H(39~43층) I(44~47층)</p>
-    <table><thead><tr><th>구역</th><th style="width:50px;text-align:center;">건수</th><th>주요 소음</th><th style="width:80px;">비율</th></tr></thead>
+    <p class="note-sm">A: 4~8층 &nbsp;|&nbsp; B: 9~13층 &nbsp;|&nbsp; C: 14~18층 &nbsp;|&nbsp; D: 19~23층 &nbsp;|&nbsp; E: 24~28층<br>F: 29~33층 &nbsp;|&nbsp; G: 34~38층 &nbsp;|&nbsp; H: 39~43층 &nbsp;|&nbsp; I: 44~47층</p>
+    <table><thead><tr><th>구역</th><th style="width:46px;text-align:center;">건수</th><th>주요 소음</th><th style="width:70px;">비율</th></tr></thead>
     <tbody>${dongFloorRows}</tbody></table>
   </div>
   <div>
     <div class="section-title">🏢 동별 접수 현황</div>
-    <table><thead><tr><th>동</th><th style="width:50px;text-align:center;">건수</th><th style="width:80px;">비율</th></tr></thead>
+    <table><thead><tr><th>동</th><th style="width:46px;text-align:center;">건수</th><th style="width:70px;">비율</th></tr></thead>
     <tbody>${dongRows}</tbody></table>
   </div>
 </div>
