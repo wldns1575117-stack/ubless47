@@ -3238,8 +3238,9 @@ function openNoticeDetail(id) {
   const n = notices.find(x=>x.id===id);
   if (!n) return;
 
-  // 조회수 증가
+  // 조회수 증가 후 저장
   n.views = (n.views||0) + 1;
+  saveToStorage();
   renderNoticeList();
   renderHomeNotices();
 
