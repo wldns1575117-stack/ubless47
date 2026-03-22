@@ -1959,9 +1959,12 @@ async function saveToStorage() {
       complaintCounter, noticeCounter, commentCounter
     });
     
-    // 대용량 전송을 위해 POST 방식으로 변경
+    // POST 방식 및 안전장치(헤더) 추가
     const res = await fetch(GAS_URL, { 
       method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
       body: raw
     });
     
@@ -1969,7 +1972,6 @@ async function saveToStorage() {
     console.log('✅ 저장 완료:', text);
   } catch(e) { console.warn('저장 오류:', e); }
 }
-
 async function loadFromStorage() {
   try {
     const res = await fetch(GAS_URL + '?t=' + Date.now());
