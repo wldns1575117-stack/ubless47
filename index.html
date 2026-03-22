@@ -1958,9 +1958,13 @@ async function saveToStorage() {
       complaints, notices, noticeComments, shortcuts,
       complaintCounter, noticeCounter, commentCounter
     });
-    const encoded = encodeURIComponent(raw);
-    const url = GAS_URL + '?action=save&d=' + encoded;
-    const res = await fetch(url, { method: 'GET' });
+    
+    // 대용량 전송을 위해 POST 방식으로 변경
+    const res = await fetch(GAS_URL, { 
+      method: 'POST',
+      body: raw
+    });
+    
     const text = await res.text();
     console.log('✅ 저장 완료:', text);
   } catch(e) { console.warn('저장 오류:', e); }
