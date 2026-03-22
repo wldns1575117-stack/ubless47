@@ -1954,17 +1954,15 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyDZNdbX1VEx9JBn3ir0Hhm
 
 async function saveToStorage() {
   try {
-    const body = JSON.stringify({
+    const raw = JSON.stringify({
       complaints, notices, noticeComments, shortcuts,
       complaintCounter, noticeCounter, commentCounter
     });
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: body
-    });
-    console.log('✅ 저장 완료');
+    const encoded = encodeURIComponent(raw);
+    const url = GAS_URL + '?action=save&d=' + encoded;
+    const res = await fetch(url, { method: 'GET' });
+    const text = await res.text();
+    console.log('✅ 저장 완료:', text);
   } catch(e) { console.warn('저장 오류:', e); }
 }
 
@@ -1976,13 +1974,13 @@ async function loadFromStorage() {
     if (!text || text === '{}') { console.log('저장된 데이터 없음'); return; }
     const d = JSON.parse(text);
     if (!d.complaints) return;
-    if (d.complaints)       complaints       = d.complaints;
-    if (d.notices)          notices          = d.notices;
-    if (d.noticeComments)   noticeComments   = d.noticeComments;
-    if (d.shortcuts)        shortcuts        = d.shortcuts;
-    if (d.complaintCounter) complaintCounter = d.complaintCounter;
-    if (d.noticeCounter)    noticeCounter    = d.noticeCounter;
-    if (d.commentCounter)   commentCounter   = d.commentCounter;
+    complaints       = d.complaints;
+    notices          = d.notices;
+    noticeComments   = d.noticeComments;
+    shortcuts        = d.shortcuts;
+    complaintCounter = d.complaintCounter;
+    noticeCounter    = d.noticeCounter;
+    commentCounter   = d.commentCounter;
     console.log('✅ 데이터 로드 완료');
     renderHomeNotices(); renderHomeComplaints(); renderLiveComplaints();
     renderHomeShortcuts(); updateHeatmapMonthUI();
