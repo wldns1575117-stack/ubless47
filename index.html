@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>유블레스 랜드마크47 | 입주민 민원 포털</title>
+
+<!-- PWA 설정 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1005">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="유블레스47">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="description" content="유블레스 랜드마크47 입주민 민원 포털 - 민원접수, 공지사항, 생활소음 집계">
+<meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@400;600&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -4863,5 +4873,192 @@ document.addEventListener('visibilitychange', () => {
 });
 startHeatmapPulse();
 </script>
+<!-- PWA Service Worker 등록 -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('✅ Service Worker 등록 완료'))
+      .catch(e => console.warn('SW 등록 실패:', e));
+  });
+}
+
+let deferredPrompt = null;
+
+// 안드로이드: 설치 프롬프트 캡처
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => {
+    if (!localStorage.getItem('pwa-done')) showAndroidBanner();
+  }, 3500);
+});
+
+function showAndroidBanner() {
+  document.getElementById('pwa-android').style.display = 'flex';
+}
+
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwa-android').style.display = 'none';
+  if (result.outcome === 'accepted') {
+    localStorage.setItem('pwa-done', '1');
+    showToast('✅ 홈 화면에 추가되었습니다!');
+  }
+}
+
+function dismissAndroid() {
+  document.getElementById('pwa-android').style.display = 'none';
+  localStorage.setItem('pwa-done', '1');
+}
+
+function dismissIOS() {
+  document.getElementById('pwa-ios').style.display = 'none';
+  localStorage.setItem('pwa-done', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem('pwa-done', '1');
+  document.getElementById('pwa-android').style.display = 'none';
+});
+
+// 아이폰: 설치 안내
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+const isStandalone = window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone;
+if (isIOS && !isStandalone && !localStorage.getItem('pwa-done')) {
+  setTimeout(() => { document.getElementById('pwa-ios').style.display = 'block'; }, 3500);
+}
+</script>
+
+<!-- 안드로이드 설치 배너 -->
+<div id="pwa-android" style="
+  display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;width:min(380px,calc(100vw - 24px));
+  background:linear-gradient(135deg,#1a1005,#2c1f0e);
+  border:1px solid rgba(200,169,110,0.45);border-radius:18px;
+  padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  flex-direction:row;align-items:center;gap:12px;
+  animation:pwaBannerUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+">
+  <img src="icon-192.png" style="width:46px;height:46px;border-radius:12px;flex-shrink:0;">
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:13px;font-weight:700;color:#f5e6b8;">📲 앱으로 설치하기</div>
+    <div style="font-size:11px;color:rgba(200,169,110,0.6);margin-top:2px;">홈 화면에서 바로 실행할 수 있어요</div>
+  </div>
+  <button onclick="installPWA()" style="
+    background:linear-gradient(135deg,#c8a96e,#8a6a2a);border:none;
+    border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;
+    color:#1a1005;cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+    flex-shrink:0;white-space:nowrap;
+  ">설치</button>
+  <button onclick="dismissAndroid()" style="
+    background:none;border:none;color:rgba(200,169,110,0.4);
+    font-size:20px;cursor:pointer;flex-shrink:0;padding:0 2px;line-height:1;
+  ">✕</button>
+</div>
+
+<!-- 아이폰 설치 안내 배너 -->
+<div id="pwa-ios" style="
+  display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:9999;width:min(380px,calc(100vw - 24px));
+  background:linear-gradient(135deg,#1a1005,#2c1f0e);
+  border:1px solid rgba(200,169,110,0.45);border-radius:18px;
+  padding:16px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  animation:pwaBannerUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+    <img src="icon-192.png" style="width:46px;height:46px;border-radius:12px;flex-shrink:0;">
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:#f5e6b8;">📲 앱으로 설치하기</div>
+      <div style="font-size:11px;color:rgba(200,169,110,0.6);margin-top:2px;">홈 화면에서 바로 실행할 수 있어요</div>
+    </div>
+    <button onclick="dismissIOS()" style="background:none;border:none;color:rgba(200,169,110,0.4);font-size:20px;cursor:pointer;padding:0;line-height:1;">✕</button>
+  </div>
+  <div style="background:rgba(200,169,110,0.08);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.8);line-height:1.9;">
+    1. 하단 <span style="color:#e8c97a;font-weight:700;">공유 버튼 □↑</span> 탭하기<br>
+    2. <span style="color:#e8c97a;font-weight:700;">"홈 화면에 추가"</span> 선택하기<br>
+    3. 오른쪽 위 <span style="color:#e8c97a;font-weight:700;">"추가"</span> 탭하기
+  </div>
+  <div style="text-align:center;margin-top:8px;font-size:20px;animation:pwaBounce 1.2s infinite;">⬇️</div>
+</div>
+
+<style>
+@keyframes pwaBannerUp {
+  from { opacity:0; transform:translateX(-50%) translateY(24px); }
+  to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+@keyframes pwaBounce {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(5px); }
+}
+</style>
 </body>
 </html>
+
+{
+  "name": "유블레스 랜드마크47 민원포털",
+  "short_name": "유블레스47",
+  "description": "유블레스 랜드마크47 입주민 민원 포털",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0800",
+  "theme_color": "#1a1005",
+  "orientation": "portrait-primary",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
+const CACHE_NAME = 'ubless47-v1';
+const urlsToCache = [
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
+];
+
+// 설치: 핵심 파일 캐시
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+  self.skipWaiting();
+});
+
+// 활성화: 오래된 캐시 삭제
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+// 요청: 네트워크 우선, 실패 시 캐시
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    fetch(e.request)
+      .then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
+});
